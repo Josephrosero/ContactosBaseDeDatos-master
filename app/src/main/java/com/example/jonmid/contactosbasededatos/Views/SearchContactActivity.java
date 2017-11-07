@@ -1,5 +1,7 @@
 package com.example.jonmid.contactosbasededatos.Views;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.TextInputEditText;
@@ -10,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jonmid.contactosbasededatos.ContactsActivity;
 import com.example.jonmid.contactosbasededatos.Helpers.SqliteHelper;
 import com.example.jonmid.contactosbasededatos.R;
 import com.example.jonmid.contactosbasededatos.Utilities.Constants;
@@ -32,13 +35,14 @@ public class SearchContactActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_contact);
 
         textViewParam = (TextView) findViewById(R.id.id_tv_search_param_name);
+
         textViewName = (TextView) findViewById(R.id.id_tv_search_name);
         textViewPhone = (TextView) findViewById(R.id.id_tv_search_phone);
         textViewEmail = (TextView) findViewById(R.id.id_tv_search_email);
 
         editTextname = (EditText) findViewById(R.id.id_name);
         editTextphone = (EditText) findViewById(R.id.id_phone);
-        editTextemail = (EditText) findViewById(R.id.id_et_search_index);
+        editTextemail = (EditText) findViewById(R.id.id_email);
 
 
         sqliteHelper = new SqliteHelper(this, "db_contacts", null, 1);
@@ -59,26 +63,41 @@ public class SearchContactActivity extends AppCompatActivity {
             Cursor cursor = db.query(Constants.TABLA_NAME_USERS, fields, Constants.TABLA_FIELD_NAME + "=?", params, null, null, null);
             cursor.moveToFirst();
 
-            textViewName.setText(cursor.getString(0));
-            textViewPhone.setText(cursor.getString(1));
-            textViewEmail.setText(cursor.getString(2));
+            textViewName.setText(cursor.getString(1));
+            textViewPhone.setText(cursor.getString(2));
+            textViewEmail.setText(cursor.getString(3));
 
             editTextname.setText(cursor.getString(1));
             editTextphone.setText(cursor.getString(2));
             editTextemail.setText(cursor.getString(3));
+
+
             id_contacto = cursor.getInt(0);
+
             cursor.close();
         } catch (Exception e) {
             Toast.makeText(this, "Nombre del contacto no encontrado", Toast.LENGTH_SHORT).show();
         }
     }
 
+
+
+
+
     public  void  updatecontact (View view) {
 
 
         SQLiteDatabase db = sqliteHelper.getReadableDatabase();
 
-        db.execSQL("update from users where id ="+id_contacto);
+        db.execSQL("UPDATE users SET name="+"'"+editTextname.getText().toString()+"'"+
+                ",phone="+"'"+editTextphone.getText()+"'"+
+                ",email="+"'"+editTextemail.getText()+"'"+
+                "WHERE id="+id_contacto);
+
+        Toast.makeText(this, "Actualizado"+id_contacto, Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, ContactsActivity.class);
+        startActivity(intent);
 
     }
 }
